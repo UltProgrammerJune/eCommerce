@@ -1,18 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using eCommerce.Data;
+using eCommerce.Models;
+using Microsoft.AspNetCore.Mvc;
 
-namespace eCommerce.Controllers
+namespace eCommerce.Controllers;
+
+public class ProductController : Controller
 {
-    public class ProductController : Controller
+    private readonly ProductDbContext _context;
+    public ProductController(ProductDbContext context)
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        _context = context;
+    }
+    public IActionResult Index()
+    {
+        return View();
+    }
 
-        [HttpGet]
-        public IActionResult Create()
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(Product product)
+    {
+        if (ModelState.IsValid)
         {
-            return View();
+            _context.Products.Add(product); /// Add to database
+            await _context.SaveChangesAsync(); /// Saves changes to database
+
+            return RedirectToAction(nameof(Index));
         }
+        return View(product); // If model state is not valid, return the view with the product to show validation errors
     }
 }
