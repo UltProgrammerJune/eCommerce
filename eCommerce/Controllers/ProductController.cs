@@ -89,6 +89,10 @@ public class ProductController : Controller
         return View(product);
     }
 
+    /// <summary>
+    /// Retrieves the product within the database and returns it to the view for confirmation before deletion.
+    /// </summary>
+
     public IActionResult Delete(int id)
     {
         Product? product = _context.Products
@@ -100,5 +104,27 @@ public class ProductController : Controller
             return NotFound();
         }
         return View(product);
+    }
+
+    /// <summary>
+    /// Deletes the specified product from the database, saves changes, and redirects to the index page with a success message.
+    /// </summary>
+
+    [ActionName(nameof(Delete))]
+    [HttpPost]
+    public async Task<IActionResult> DeleteConfirm(int id)
+    {
+        Product? product = await _context.Products.FindAsync(id);
+
+        if (product == null)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        _context.Remove(product);
+        await _context.SaveChangesAsync();
+
+        TempData["Message"] = $"{product.Title} was deleted successfully!";
+        return RedirectToAction(nameof(Index));
     }
 }
