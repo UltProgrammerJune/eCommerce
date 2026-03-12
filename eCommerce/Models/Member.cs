@@ -55,3 +55,10 @@ public class RegisterViewModel
     [DataType(DataType.Date)]
     public DateOnly DOB { get; set; }
 }
+public class LoginViewModel
+{
+
+    public required string UsernameOrEmail { get; set; }
+    [DataType(DataType.Password)]
+    public required string Password { get; set; }
+}
