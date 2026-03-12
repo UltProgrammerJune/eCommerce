@@ -38,4 +38,19 @@ public class ProductController : Controller
         }
         return View(product); // If model state is not valid, return the view with the product to show validation errors
     }
+
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        Product? product = _context.Products
+            .Where(p => p.ProductId == id)
+            .FirstOrDefault();
+
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        return View(product);
+    }
 }
