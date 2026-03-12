@@ -1,6 +1,7 @@
 ﻿using eCommerce.Data;
 using eCommerce.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.Controllers;
 
@@ -11,9 +12,10 @@ public class ProductController : Controller
     {
         _context = context;
     }
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        List<Product> allProducts = await _context.Products.ToListAsync();
+        return View(allProducts);
     }
 
     [HttpGet]
@@ -29,6 +31,8 @@ public class ProductController : Controller
         {
             _context.Products.Add(product); /// Add to database
             await _context.SaveChangesAsync(); /// Saves changes to database
+
+            TempData["Message"] = $"{product.Title} was created successfully!"; // Set a success message to display after redirecting
 
             return RedirectToAction(nameof(Index));
         }

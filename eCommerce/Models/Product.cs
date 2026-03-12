@@ -14,5 +14,6 @@ public class Product
     [StringLength(50, ErrorMessage = "Name cannot be longer than 50 characters.")]
     public required string Title { get; set; }
     [Range(0, 10_000)]
+    [DataType(DataType.Currency)]
     public decimal Price { get; set; }
 }
