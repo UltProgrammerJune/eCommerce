@@ -9,6 +9,21 @@ public class ProductDbContext : DbContext
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Ensures the Member Username is unique 
+        modelBuilder.Entity<Member>()
+            .HasIndex(m => m.Name)
+            .IsUnique();
+        // Ensures the Member Email is unique 
+        modelBuilder.Entity<Member>()
+            .HasIndex(m => m.Email)
+            .IsUnique();
+
+    }
+
     // Entities to be tracked by DbContext
     public DbSet<Product> Products { get; set; }
+
+    public DbSet<Member> Members { get; set; }
 }
