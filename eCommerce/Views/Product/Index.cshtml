@@ -21,6 +21,10 @@
 }
 else
 {
+	/// <summary>
+	/// Display the products in a table format, showing the Title and Price of each product, along with an Update and Delete button for each product.
+	/// </summary>
+
 	<table class="table table-striped">
 		<thead>
 			<tr>
@@ -39,7 +43,10 @@ else
 						<a class="btn btn-primary" asp-controller="Product" 
 							asp-action="Edit" 
 							asp-route-id="@product.ProductId">Update</a>
-						-- Delete
+						--
+						<a class="btn btn-danger" asp-controller="Product"
+						   asp-action="Delete"
+						   asp-route-id="@product.ProductId">Delete</a>
 					</td>
 				</tr>
 			}
