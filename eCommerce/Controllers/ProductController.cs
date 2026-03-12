@@ -93,16 +93,16 @@ public class ProductController : Controller
     /// Retrieves the product within the database and returns it to the view for confirmation before deletion.
     /// </summary>
 
-    public IActionResult Delete(int id)
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
     {
-        Product? product = _context.Products
-            .Where(p => p.ProductId == id)
-            .FirstOrDefault();
+        Product? product = await _context.Products.FindAsync(id);
 
         if (product == null)
         {
             return NotFound();
         }
+
         return View(product);
     }
 
