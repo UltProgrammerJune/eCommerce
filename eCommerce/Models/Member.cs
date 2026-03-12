@@ -41,7 +41,7 @@ public class RegisterViewModel
     [RegularExpression(@"^[a-zA-Z0-9]+$",
         ErrorMessage = "Username must be alphanumeric.")]
     [StringLength(25)]
-    public required string Username { get; set; }
+    public required string Name { get; set; }
     [DataType(DataType.EmailAddress)]
     public required string Email { get; set; }
     [StringLength(50, MinimumLength = 6,
