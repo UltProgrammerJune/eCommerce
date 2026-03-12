@@ -32,6 +32,8 @@ public class ProductController : Controller
             _context.Products.Add(product); /// Add to database
             await _context.SaveChangesAsync(); /// Saves changes to database
 
+            TempData["Message"] = $"{product.Title} was created successfully!"; // Set a success message to display after redirecting
+
             return RedirectToAction(nameof(Index));
         }
         return View(product); // If model state is not valid, return the view with the product to show validation errors
