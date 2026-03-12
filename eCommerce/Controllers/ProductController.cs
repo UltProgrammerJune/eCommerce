@@ -56,11 +56,9 @@ public class ProductController : Controller
     /// <summary>
     /// Retrieves the product with the specified ID from the database and returns it to the view for editing.
     /// </summary>
-    public IActionResult Edit(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        Product? product = _context.Products
-            .Where(p => p.ProductId == id)
-            .FirstOrDefault();
+        Product? product = await _context.Products.FindAsync(id);
 
         if (product == null)
         {
