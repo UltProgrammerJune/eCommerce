@@ -19,10 +19,32 @@ public class ProductController : Controller
     /// <summary>
     /// Retrieves all products from the database and returns them to the view for display.
     /// </summary>
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        List<Product> allProducts = await _context.Products.ToListAsync();
-        return View(allProducts);
+        const int productsPerPage = 3; // Number of products to display per page
+
+        int totalProducts = await _context.Products.CountAsync();
+        int totalPagesNeeded = (int)Math.Ceiling(totalProducts / (double)productsPerPage);
+
+        if (page < 1) page = 1;
+        if (totalPagesNeeded > 0 && page > totalPagesNeeded) page = totalPagesNeeded;
+
+        List<Product> products = await _context.Products
+            .OrderBy(p => p.ProductId)
+            .Skip((page - 1) * productsPerPage)
+            .Take(productsPerPage)
+            .ToListAsync();
+
+        ProductListViewModel productListViewModel = new()
+        {
+            Products = products,
+            CurrentPage = page,
+            TotalPages = totalPagesNeeded,
+            PageSize = productsPerPage,
+            TotalItems = totalProducts
+        };
+
+        return View(productListViewModel);
     }
 
     [HttpGet]
