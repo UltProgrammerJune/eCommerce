@@ -62,10 +62,17 @@ public class MemberController : Controller
                 return View(login);
             }
             // Log the user in
+            HttpContext.Session.SetString("Username", loggedInMember.Name);
+            HttpContext.Session.SetInt32("ID", loggedInMember.MemberID);
 
             return RedirectToAction("Index", "Home");
         }
         return View(login);
+    }
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+        return RedirectToAction("Index", "Home");
     }
 }
 
