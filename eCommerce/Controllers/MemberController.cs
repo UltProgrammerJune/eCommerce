@@ -75,9 +75,10 @@ public class MemberController : Controller
         if (ModelState.IsValid)
         {
             // Check if the user exists in the database
-            Member? loggedInMember = await _context.Members
+            var loggedInMember = await _context.Members
                                     .Where(m => (m.Email == login.UsernameOrEmail || m.Name == login.UsernameOrEmail)
                                         && m.Password == login.Password)
+                                    .Select(m => new { m.Name, m.MemberID})
                                     .SingleOrDefaultAsync();
 
             if (loggedInMember == null)
