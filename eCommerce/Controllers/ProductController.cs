@@ -8,28 +8,49 @@ namespace eCommerce.Controllers;
 public class ProductController : Controller
 {
     private readonly ProductDbContext _context;
+
     /// <summary>
     /// Initializes a new instance of the ProductController class using the specified database context.
     /// </summary>
-    /// <param name="context">The database context used to access and manage product data within the application.</param>
     public ProductController(ProductDbContext context)
     {
         _context = context;
     }
+
     /// <summary>
-    /// Retrieves all products from the database and returns them to the view for display.
+    /// Retrieves products from the database (with optional search / price filters)
+    /// and returns them to the view for display with pagination.
     /// </summary>
-    public async Task<IActionResult> Index(int page = 1)
+    [HttpGet]
+    public async Task<IActionResult> Index(string? searchTerm, decimal? minPrice, decimal? maxPrice, int page = 1)
     {
         const int productsPerPage = 3; // Number of products to display per page
 
-        int totalProducts = await _context.Products.CountAsync();
+        IQueryable<Product> query = _context.Products;
+
+        // Apply filters
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(p => p.Title.Contains(searchTerm));
+        }
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        int totalProducts = await query.CountAsync();
         int totalPagesNeeded = (int)Math.Ceiling(totalProducts / (double)productsPerPage);
 
         if (page < 1) page = 1;
         if (totalPagesNeeded > 0 && page > totalPagesNeeded) page = totalPagesNeeded;
 
-        List<Product> products = await _context.Products
+        List<Product> products = await query
             .OrderBy(p => p.ProductId)
             .Skip((page - 1) * productsPerPage)
             .Take(productsPerPage)
@@ -41,43 +62,37 @@ public class ProductController : Controller
             CurrentPage = page,
             TotalPages = totalPagesNeeded,
             PageSize = productsPerPage,
-            TotalItems = totalProducts
+            TotalItems = totalProducts,
+            SearchTerm = searchTerm,
+            MinPrice = minPrice,
+            MaxPrice = maxPrice
         };
 
         return View(productListViewModel);
     }
 
     [HttpGet]
-    /// <summary>
-    /// Returns the view for creating a new product, allowing the user to input product details.
-    /// </summary>
     public IActionResult Create()
     {
         return View();
     }
 
     [HttpPost]
-    /// <summary>
-    /// Validates the model state, adds the new product to the database, saves changes, and redirects to the index page with a success message.
-    /// </summary>
     public async Task<IActionResult> Create(Product product)
     {
         if (ModelState.IsValid)
         {
-            _context.Products.Add(product); /// Add to database
-            await _context.SaveChangesAsync(); /// Saves changes to database
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
 
-            TempData["Message"] = $"{product.Title} was created successfully!"; // Set a success message to display after redirecting
-
+            TempData["Message"] = $"{product.Title} was created successfully!";
             return RedirectToAction(nameof(Index));
         }
-        return View(product); // If model state is not valid, return the view with the product to show validation errors
+
+        return View(product);
     }
 
     [HttpGet]
-    /// <summary>
-    /// Retrieves the product with the specified ID from the database and returns it to the view for editing.
-    /// </summary>
     public async Task<IActionResult> Edit(int id)
     {
         Product? product = await _context.Products.FindAsync(id);
@@ -91,10 +106,6 @@ public class ProductController : Controller
     }
 
     [HttpPost]
-
-    /// <summary>
-    /// Validates the model state, updates the product in the database, and redirects to the index page with a success message.
-    /// </summary>
     public async Task<IActionResult> Edit(Product product)
     {
         if (ModelState.IsValid)
@@ -103,15 +114,12 @@ public class ProductController : Controller
             await _context.SaveChangesAsync();
 
             TempData["Message"] = $"{product.Title} was updated successfully!";
+
             return RedirectToAction(nameof(Index));
         }
 
         return View(product);
     }
-
-    /// <summary>
-    /// Retrieves the product within the database and returns it to the view for confirmation before deletion.
-    /// </summary>
 
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
@@ -125,10 +133,6 @@ public class ProductController : Controller
 
         return View(product);
     }
-
-    /// <summary>
-    /// Deletes the specified product from the database, saves changes, and redirects to the index page with a success message.
-    /// </summary>
 
     [ActionName(nameof(Delete))]
     [HttpPost]

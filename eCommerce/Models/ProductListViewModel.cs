@@ -9,4 +9,9 @@ public class ProductListViewModel
     public int TotalPages { get; set; }
     public int PageSize { get; set; }
     public int TotalItems { get; set; }
+
+    // Search / filter properties
+    public string? SearchTerm { get; set; }
+    public decimal? MinPrice { get; set; }
+    public decimal? MaxPrice { get; set; }
 }
