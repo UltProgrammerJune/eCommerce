@@ -6,7 +6,6 @@ of ASP.NET Core MVC (Models View Controller).
 - Styling with Bootstrap 5
 - CRUD (Create/Retrieve/Update/Delete) functionality with Entity Framework Core
 - Login/Register
-- Shopping Cart
 
 ## How to get started
 - Clone/Download the repository
